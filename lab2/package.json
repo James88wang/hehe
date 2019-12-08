@@ -1,0 +1,24 @@
+{
+  "name": "hehe",
+  "version": "1.0.0",
+  "description": "\"Node JS project for Ece class\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "./node_modules/.bin/nodemon "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/James88wang/hehe.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/James88wang/hehe/issues"
+  },
+  "homepage": "https://github.com/James88wang/hehe#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.1"
+  }
+}
