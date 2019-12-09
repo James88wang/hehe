@@ -1,4 +1,4 @@
-import {LevelDB} from './leveldb'
+import { LevelDB } from './leveldb'
 import WriteStream from 'level-ws'
 
 export class Metric {
@@ -12,7 +12,7 @@ export class Metric {
 }
 
 export class MetricsHandler {
-  private db: any 
+  private db: any
 
   constructor(dbPath: string) {
     this.db = LevelDB.open(dbPath)
@@ -26,55 +26,59 @@ export class MetricsHandler {
     })
     stream.end()
   }
-  public getAll(  
-    callback: (error: Error | null, result: Metric[]) => void) 
-    {
-      let metrics: Metric[] = [];
-      this.db.createReadStream()
-        .on('data', function (data) {
+  public getAll(
+    callback: (error: Error | null, result: Metric[]) => void) {
+    let metrics: Metric[] = [];
+    this.db.createReadStream()
+      .on('data', function (data) {
+        let oneMetric: Metric = new Metric(data.key, data.value)
+        metrics.push(oneMetric)
+        console.log(data.key, '=', data.value)
+        //callback(null, data) we will retrive data metrics with the callback in "end" !!
+      }) // if i put this callback then we have 2 setheaders leading to error !
+      .on('error', function (err) {
+        console.log('Oh my!', err)
+        callback(err, err) // 
+      })
+      .on('close', function () {
+        console.log('Stream closed')
+      })
+      .on('end', function () {
+        console.log('Stream ended')
+        callback(null, metrics)
+      })
+  }
+
+  public getOne(key,
+    callback: (error: Error | null, result: Metric[]) => void) {
+    let metrics: Metric[] = [];
+    this.db.createReadStream()
+      .on('data', function (data) {
+        if (data.key == key) {
           let oneMetric: Metric = new Metric(data.key, data.value)
+          // trouver une methode pour afficher qu'un seul metric
           metrics.push(oneMetric)
           console.log(data.key, '=', data.value)
-          //callback(null, data) we will retrive data metrics with the callback in "end" !!
-        }) // if i put this callback then we have 2 setheaders leading to error !
-        .on('error', function (err) {
-          console.log('Oh my!', err)
-          callback(err, err) // 
-        })
-        .on('close', function () {
-          console.log('Stream closed')
-        })
-        .on('end', function () {
-          console.log('Stream ended')
-          callback(null, metrics)  
-        })
-    }
+        }
+      })
+      .on('error', function (err) {
+        console.log('Oh my!', err)
+        callback(err, err) // 
+      })
+      .on('close', function () {
+        console.log('Stream closed')
+      })
+      .on('end', function () {
+        console.log('Stream ended')
+        callback(null, metrics)
+      })
+  }
 
-  public getOne( 
-    callback: (error: Error | null, result: Metric[]) => void) 
-    {
-      let metrics: Metric[] = [];
-      this.db.createReadStream()
-        .on('data', function (data) {
-          let oneMetric: Metric = new Metric(data.key, data.value)
-           // trouver une methode pour afficher qu'un seul metric
-          metrics.push(oneMetric)
-          console.log(data.key, '=', data.value)
-        })
-        .on('error', function (err) {
-          console.log('Oh my!', err)
-          callback(err, err) // 
-        })
-        .on('close', function () {
-          console.log('Stream closed')
-        })
-        .on('end', function () {
-          console.log('Stream ended')
-          callback(null, metrics)  
-        })
-    } 
-
-   
+  public delOne(key, callback: (error: Error | null) => void) {
+      
+      this.db.del(key, callback(null ))
+      
+  }
 
   static get(callback: (error: Error | null, result?: Metric[]) => void) {
     const result = [
