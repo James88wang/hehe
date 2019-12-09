@@ -47,7 +47,6 @@ export class MetricsHandler {
         console.log('Stream ended')
         callback(null, metrics) 
       })
-
   }
 
 

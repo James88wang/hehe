@@ -9,8 +9,8 @@ const port: string = process.env.PORT || '8088'
 app.use(express.static(path.join(__dirname, '/../public')))
 
 app.use(bodyparser.json())
-app.use(bodyparser.urlencoded())
-
+//app.use(bodyparser.urlencoded())
+app.use(bodyparser.urlencoded({ extended: true }));
 app.get('/', (req: any, res: any) => {
   res.write('Hello world')
   res.end()
