@@ -38,6 +38,17 @@ app.post('/metrics/:id', (req: any, res: any) => {
   })
 })
 
+app.get('/metrics/getAll', (req: any, res: any) => {
+  dbMet.getAll( 
+    (
+      err: Error | null, result?: any
+    ) => {
+      if (err) throw err
+      console.log("we try to get All metrics")
+      res.status(200).send(result)
+  })
+})
+
 app.listen(port, (err: Error) => {
   if (err) {
     throw err

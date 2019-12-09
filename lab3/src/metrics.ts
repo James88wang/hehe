@@ -1,4 +1,4 @@
-import {LevelDB} from './leveldb'
+import { LevelDB } from './leveldb'
 import WriteStream from 'level-ws'
 
 export class Metric {
@@ -12,7 +12,7 @@ export class Metric {
 }
 
 export class MetricsHandler {
-  private db: any 
+  private db: any
 
   constructor(dbPath: string) {
     this.db = LevelDB.open(dbPath)
@@ -27,6 +27,29 @@ export class MetricsHandler {
     })
     stream.end()
   }
+
+  public getAll(callback: (error: Error | null, result: Metric[]) => void) {
+    let metrics: Metric[] = [];
+    this.db.createReadStream()
+      .on('data', function (data) {
+        console.log(data.key, '=', data.value)
+        let oneMetric: Metric = new Metric(data.key, data.value)
+          metrics.push(oneMetric)
+          console.log(data.key, '=', data.value)
+      })
+      .on('error', function (err) {
+        console.log('Oh my!', err)
+      })
+      .on('close', function () {
+        console.log('Stream closed')
+      })
+      .on('end', function () {
+        console.log('Stream ended')
+        callback(null, metrics) 
+      })
+
+  }
+
 
   static get(callback: (error: Error | null, result?: Metric[]) => void) {
     const result = [
