@@ -2,10 +2,14 @@ import { LevelDB } from './leveldb'
 import WriteStream from 'level-ws'
 
 export class Metric {
+  public username: string
+  public m_name: string
   public timestamp: string
   public value: number
 
-  constructor(ts: string, v: number) {
+  constructor(u: string, m_name: string, ts: string, v: number) {
+    this.username = u
+    this.m_name = m_name
     this.timestamp = ts
     this.value = v
   }
@@ -17,24 +21,35 @@ export class MetricsHandler {
   constructor(dbPath: string) {
     this.db = LevelDB.open(dbPath)
   }
-  public save(key: number, metrics: Metric[], callback: (error: Error | null) => void) {
+
+  public save(myMetric: Metric, callback: (error: Error | null) => void) {
     const stream = WriteStream(this.db)
     stream.on('error', callback)
     stream.on('close', callback)
-    metrics.forEach((m: Metric) => {
-      stream.write({ key: `metric:${key}${m.timestamp}`, value: m.value })
-    })
+
+    var username = myMetric.username
+    var m_name = myMetric.m_name
+    var timestamp = myMetric.timestamp
+    var value = myMetric.value
+    
+    stream.write({ key: `${username}|${m_name}|${timestamp}`, value: `${value}` })
+    
     stream.end()
   }
-  public getAll(
+
+  
+  public getAll( username: string,
     callback: (error: Error | null, result: Metric[]) => void) {
     let metrics: Metric[] = [];
     this.db.createReadStream()
       .on('data', function (data) {
-        let oneMetric: Metric = new Metric(data.key, data.value)
-        metrics.push(oneMetric)
-        console.log(data.key, '=', data.value)
-        //callback(null, data) we will retrive data metrics with the callback in "end" !!
+        console.log(data)
+        var [u, m_name, timestamp] = data.key.split('|')
+        var value = data.value
+        if(username == u){
+          let oneMetric: Metric = new Metric(u, m_name, timestamp, value)
+          metrics.push(oneMetric)
+        }
       }) // if i put this callback then we have 2 setheaders leading to error !
       .on('error', function (err) {
         console.log('Oh my!', err)
@@ -49,6 +64,7 @@ export class MetricsHandler {
       })
   }
 
+  /*
   public getOne(key,
     callback: (error: Error | null, result: Metric[]) => void) {
     let metrics: Metric[] = [];
@@ -86,5 +102,5 @@ export class MetricsHandler {
       new Metric('2013-11-04 14:30 UTC', 15)
     ]
     callback(null, result)
-  }
+  }*/
 }

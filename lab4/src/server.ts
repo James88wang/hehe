@@ -26,12 +26,12 @@ app.use(session({
   saveUninitialized: true
 }))
 
-
 authRouter.get('/login', (req: any, res: any) => {
-  res.render('login')
+  res.render('login') 
 })
 
 authRouter.get('/signup', (req: any, res: any) => {
+  console.log('test delete')
   res.render('signup')
 })
 
@@ -40,7 +40,7 @@ authRouter.get('/logout', (req: any, res: any) => {
   delete req.session.user
   res.redirect('/login')
 })
-
+ 
 authRouter.post('/login', (req: any, res: any, next: any) => {
   dbUser.get(req.body.username, (err: Error | null, result?: User) => {
     if (err) next(err)
@@ -57,6 +57,13 @@ authRouter.post('/login', (req: any, res: any, next: any) => {
 const userRouter = express.Router()
 app.use(authRouter)
 app.use('/user', userRouter)
+
+const port: string = process.env.PORT || '8082'
+
+app.use(express.static(path.join(__dirname, '/../public')))
+
+const dbMet: MetricsHandler = new MetricsHandler('./db/metrics')
+
 
 userRouter.post('/', (req: any, res: any, next: any) => {
   dbUser.get(req.body.username, function (err: Error | null, result?: User) {
@@ -80,41 +87,54 @@ userRouter.get('/:username', (req: any, res: any, next: any) => {
   })
 })
 
+userRouter.delete('/:username', (req: any, res: any) => {
+  dbUser.delete(req.params.username, function (err: Error | null, result?: User) {
+    //console.log(req.params.username)
+    res.end()
+  })
+})
+
 
 const authCheck = function (req: any, res: any, next: any) {
   if (req.session.loggedIn) {
     next()
   } else res.redirect('/login')
 }
-
+ 
 app.get('/', authCheck, (req: any, res: any) => {
-  res.render('index', { name: req.session.username })
+  res.render('index', { name: JSON.stringify(req.session.user.username) })
 })
 
-const port: string = process.env.PORT || '8082'
-
-app.use(express.static(path.join(__dirname, '/../public')))
-
-
-
-const dbMet: MetricsHandler = new MetricsHandler('./db/metrics')
-
-app.post('/metrics/:id', (req: any, res: any) => {
-  dbMet.save(req.params.id, req.body, (err: Error | null) => {
+ 
+app.post('/metrics', (req: any, res: any) => {
+  var dateNow = JSON.stringify( new Date )
+  var myMetric = new Metric(req.session.user.username, req.body.m_name, dateNow, req.body.value)
+  dbMet.save(myMetric, (err: Error | null) => {
     if (err) throw err
-    res.status(200).send('ola que tal ?')
+    res.status(200).redirect('/')
   })
 })
 
-app.get('/metrics/getAll', (req: any, res: any) => {
-  dbMet.getAll(
+
+app.get('/metrics', (req: any, res: any) => {
+  dbMet.getAll( req.session.user.username,
     (
       err: Error | null, result?: any
     ) => {
       if (err) throw err
-      console.log("we try to get All metrics")
       res.status(200).send(result)
     })
+})
+
+
+
+/*
+app.post('/metrics/:id', (req: any, res: any) => {
+  
+  dbMet.save(req.params.id, req.body, (err: Error | null) => {
+    if (err) throw err
+    res.status(200).send('ola que tal ?')
+  })
 })
 
 app.get('/metrics/getOne/:key', (req: any, res: any) => {
@@ -127,6 +147,7 @@ app.get('/metrics/getOne/:key', (req: any, res: any) => {
     })
 })
 
+/
 app.get('/metrics/delOne/:key', (req: any, res: any) => {
   dbMet.delOne(req.params.key,
     (err: Error | null) => {
@@ -135,6 +156,7 @@ app.get('/metrics/delOne/:key', (req: any, res: any) => {
       res.status(200).send('Delete successful')
     })
 })
+*/
 
 app.get('/', (req: any, res: any) => {
   res.write('Hello world')
@@ -144,7 +166,7 @@ app.get('/', (req: any, res: any) => {
 app.get('/hello/:name', (req: any, res: any) => {
   res.render('hello.ejs', { name: req.params.name })
 })
-
+/*
 app.get('/metrics.json', (req: any, res: any) => {
   MetricsHandler.get((err: Error | null, result?: any) => {
     if (err) {
@@ -152,7 +174,7 @@ app.get('/metrics.json', (req: any, res: any) => {
     }
     res.json(result)
   })
-})
+})*/
 
 app.listen(port, (err: Error) => {
   if (err) {
