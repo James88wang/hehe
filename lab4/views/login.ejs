@@ -1,6 +1,15 @@
-<div id="form">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <% include partials/head %>
+</head>
+
+<body class="container">
+
+  <div id="form">
     <p>Please login to your account</p>
-    <hr/>
+    <hr />
     <form action="/login" method="post">
       <div class="form-group">
         <label for="form_username">Username</label>
@@ -12,8 +21,12 @@
       </div>
       <button class="btn btn-primary btn-block" type="submit" value="Submit">Connect</button>
     </form>
-    <hr/>
+    <hr />
     <button class="btn btn-success btn-block" type="submit" href="/signup" onClick='document.location.href="/signup"'>
       Create an account
     </button>
   </div>
+
+</body>
+
+</html>

@@ -8,6 +8,25 @@ import { UserHandler, User } from './user'
 const dbUser: UserHandler = new UserHandler('./db/users')
 const authRouter = express.Router()
 
+
+const app = express()
+app.set('views', __dirname + "/../views")
+app.set('view engine', 'ejs');
+
+app.use(bodyparser.json())
+app.use(bodyparser.urlencoded({extended:true}))
+
+
+const LevelStore = levelSession(session)
+
+app.use(session({
+  secret: 'my very secret phrase',
+  store: new LevelStore('./db/sessions'),
+  resave: true,
+  saveUninitialized: true
+}))
+
+
 authRouter.get('/login', (req: any, res: any) => {
   res.render('login')
 })
@@ -21,6 +40,7 @@ authRouter.get('/logout', (req: any, res: any) => {
   delete req.session.user
   res.redirect('/login')
 })
+
 authRouter.post('/login', (req: any, res: any, next: any) => {
   dbUser.get(req.body.username, (err: Error | null, result?: User) => {
     if (err) next(err)
@@ -35,13 +55,16 @@ authRouter.post('/login', (req: any, res: any, next: any) => {
 })
 
 const userRouter = express.Router()
+app.use(authRouter)
+app.use('/user', userRouter)
 
 userRouter.post('/', (req: any, res: any, next: any) => {
   dbUser.get(req.body.username, function (err: Error | null, result?: User) {
     if (!err || result !== undefined) {
      res.status(409).send("user already exists")
     } else {
-      dbUser.save(req.body, function (err: Error | null) {
+      let newUser = new User(req.body.username, req.body.email, req.body.password)
+      dbUser.save(newUser, function (err: Error | null) {
         if (err) next(err)
         else res.status(201).send("user persisted")
       })
@@ -58,11 +81,6 @@ userRouter.get('/:username', (req: any, res: any, next: any) => {
 })
 
 
-const app = express()
-
-app.use(authRouter)
-app.use('/user', userRouter)
-
 const authCheck = function (req: any, res: any, next: any) {
   if (req.session.loggedIn) {
     next()
@@ -72,24 +90,12 @@ const authCheck = function (req: any, res: any, next: any) {
 app.get('/', authCheck, (req: any, res: any) => {
   res.render('index', { name: req.session.username })
 })
+
 const port: string = process.env.PORT || '8082'
 
 app.use(express.static(path.join(__dirname, '/../public')))
 
-const LevelStore = levelSession(session)
 
-app.use(session({
-  secret: 'my very secret phrase',
-  store: new LevelStore('./db/sessions'),
-  resave: true,
-  saveUninitialized: true
-}))
-
-app.set('views', __dirname + "/../views")
-app.set('view engine', 'ejs');
-
-app.use(bodyparser.json())
-app.use(bodyparser.urlencoded())
 
 const dbMet: MetricsHandler = new MetricsHandler('./db/metrics')
 
