@@ -43,17 +43,16 @@ export class MetricsHandler {
     let metrics: Metric[] = [];
     this.db.createReadStream()
       .on('data', function (data) {
-        console.log(data)
         var [u, m_name, timestamp] = data.key.split('|')
         var value = data.value
         if(username == u){
           let oneMetric: Metric = new Metric(u, m_name, timestamp, value)
           metrics.push(oneMetric)
         }
-      }) // if i put this callback then we have 2 setheaders leading to error !
+      }) 
       .on('error', function (err) {
         console.log('Oh my!', err)
-        callback(err, err) // 
+        callback(err, err)
       })
       .on('close', function () {
         console.log('Stream closed')
@@ -79,7 +78,7 @@ export class MetricsHandler {
       })
       .on('error', function (err) {
         console.log('Oh my!', err)
-        callback(err, err) // 
+        callback(err, err)
       })
       .on('close', function () {
         console.log('Stream closed')
@@ -91,17 +90,18 @@ export class MetricsHandler {
   }
 
 
-  public delOne(key, callback: (error: Error | null) => void) {
+  public delOne(key: string , callback: (error: Error | null) => void) {
       
       this.db.del(key, callback(null ))
   }
-  
-/*
-  static get(callback: (error: Error | null, result?: Metric[]) => void) {
-    const result = [
-      new Metric('2013-11-04 14:00 UTC', 12),
-      new Metric('2013-11-04 14:30 UTC', 15)
-    ]
-    callback(null, result)
-  }*/
+
+  public updateOne(key: string, value: number , callback: (error: Error | null) => void) {
+    this.db.put(key, value, (error)=> {
+      if (error) {
+        console.log('error trying update')
+        callback(error)
+      } else callback(null)
+    })
+  }
+
 }

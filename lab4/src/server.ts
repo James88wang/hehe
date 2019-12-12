@@ -5,9 +5,11 @@ import bodyparser = require('body-parser')
 import session = require('express-session')
 import levelSession = require('level-session-store')
 import { UserHandler, User } from './user'
-const dbUser: UserHandler = new UserHandler('./db/users')
-const authRouter = express.Router()
 
+const port: string = process.env.PORT || '8082'
+
+const dbUser: UserHandler = new UserHandler('./db/users')
+const dbMet: MetricsHandler = new MetricsHandler('./db/metrics')
 
 const app = express()
 app.set('views', __dirname + "/../views")
@@ -15,9 +17,10 @@ app.set('view engine', 'ejs');
 
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
-
+app.use(express.static(path.join(__dirname, '/../public')))
 
 const LevelStore = levelSession(session)
+
 
 app.use(session({
   secret: 'my very secret phrase',
@@ -26,12 +29,19 @@ app.use(session({
   saveUninitialized: true
 }))
 
+/////////////////////////////////////////
+//////////    Authentication   //////////
+//////////      Management     //////////
+/////////////////////////////////////////
+
+const authRouter = express.Router()
+app.use(authRouter)
+
 authRouter.get('/login', (req: any, res: any) => {
   res.render('login')
 })
 
 authRouter.get('/signup', (req: any, res: any) => {
-  console.log('test delete')
   res.render('signup')
 })
 
@@ -54,16 +64,24 @@ authRouter.post('/login', (req: any, res: any, next: any) => {
   })
 })
 
+const authCheck = function (req: any, res: any, next: any) {
+  if (req.session.loggedIn) {
+    next()
+  } else res.redirect('/login')
+}
+
+app.get('/', authCheck, (req: any, res: any) => {
+  res.render('index', { name: JSON.stringify(req.session.user.username) })
+})
+
+
+/////////////////////////////////////////
+//////////////    User    ///////////////
+////////////// Management ///////////////
+/////////////////////////////////////////
+
 const userRouter = express.Router()
-app.use(authRouter)
 app.use('/user', userRouter)
-
-const port: string = process.env.PORT || '8082'
-
-app.use(express.static(path.join(__dirname, '/../public')))
-
-const dbMet: MetricsHandler = new MetricsHandler('./db/metrics')
-
 
 userRouter.post('/', (req: any, res: any, next: any) => {
   dbUser.get(req.body.username, function (err: Error | null, result?: User) {
@@ -89,21 +107,16 @@ userRouter.get('/:username', (req: any, res: any, next: any) => {
 
 userRouter.delete('/:username', (req: any, res: any) => {
   dbUser.delete(req.params.username, function (err: Error | null, result?: User) {
-    //console.log(req.params.username)
     res.end()
   })
 })
 
 
-const authCheck = function (req: any, res: any, next: any) {
-  if (req.session.loggedIn) {
-    next()
-  } else res.redirect('/login')
-}
 
-app.get('/', authCheck, (req: any, res: any) => {
-  res.render('index', { name: JSON.stringify(req.session.user.username) })
-})
+/////////////////////////////////////////
+//////////////   Metric   ///////////////
+////////////// Management ///////////////
+/////////////////////////////////////////
 
 const metricRouter = express.Router()
 app.use('/metrics', metricRouter)
@@ -119,18 +132,7 @@ metricRouter.post('/', (req: any, res: any) => {
 
 
 metricRouter.get('/', (req: any, res: any) => {
-    dbMet.getAll(req.session.user.username,
-      (
-        err: Error | null, result?: any
-      ) => {
-        if (err) throw err
-        res.status(200).send(result)
-      })
-}) 
-
-metricRouter.get('/:m_name', (req: any, res: any) => {
-  
-  dbMet.getOne( req.session.user.username, req.params.m_name,
+  dbMet.getAll(req.session.user.username,
     (
       err: Error | null, result?: any
     ) => {
@@ -139,73 +141,60 @@ metricRouter.get('/:m_name', (req: any, res: any) => {
     })
 })
 
-metricRouter.delete('/:m_name', (req: any, res: any) => { 
-  var username = req.session.user.username
-  var m_name = req.params.m_name
-  var metrics
+metricRouter.get('/:m_name', (req: any, res: any) => {
 
-  dbMet.getOne(username, m_name, (err: Error | null, result?: any)=> {
-    metrics = result
-
-    metrics.forEach(element => {
-      var timestamp = element.timestamp
-      var key = username + '|' + m_name + '|' + timestamp
-  
-      dbMet.delOne(key, (err: Error | null) => {  console.log('Error delOne')})
-    });
-  })
-
-  res.redirect('/')
-})
-
-
-/*
-app.post('/metrics/:id', (req: any, res: any) => {
-  
-  dbMet.save(req.params.id, req.body, (err: Error | null) => {
-    if (err) throw err
-    res.status(200).send('ola que tal ?')
-  })
-})
-
-app.get('/metrics/getOne/:key', (req: any, res: any) => {
-  dbMet.getOne(req.params.key,
+  dbMet.getOne(req.session.user.username, req.params.m_name,
     (
       err: Error | null, result?: any
     ) => {
-      console.log("we try to get one metric")
+      if (err) throw err
       res.status(200).send(result)
     })
 })
 
-/
-app.get('/metrics/delOne/:key', (req: any, res: any) => {
-  dbMet.delOne(req.params.key,
-    (err: Error | null) => {
+metricRouter.delete('/:m_name', (req: any, res: any) => {
+  var username = req.session.user.username
+  var m_name = req.params.m_name
 
-      console.log("we try to delete a metric")
-      res.status(200).send('Delete successful')
-    })
-})
-*/
+  dbMet.getOne(username, m_name, (err: Error | null, result?: any) => {
 
-app.get('/', (req: any, res: any) => {
-  res.write('Hello world')
-  res.end()
-})
+    result.forEach(element => {
+      var timestamp = element.timestamp
+      var key = username + '|' + m_name + '|' + timestamp
 
-app.get('/hello/:name', (req: any, res: any) => {
-  res.render('hello.ejs', { name: req.params.name })
-})
-/*
-app.get('/metrics.json', (req: any, res: any) => {
-  MetricsHandler.get((err: Error | null, result?: any) => {
-    if (err) {
-      throw err
-    }
-    res.json(result)
+      dbMet.delOne(key, (err: Error | null) => {
+        if (err) {
+          console.log('Error delOne')
+          res.status(500)
+        }
+        else res.status(200)
+      })
+    });
   })
-})*/
+})
+
+metricRouter.put('/:m_name', (req: any, res: any) => {
+  var username = req.session.user.username
+  var m_name = req.params.m_name
+  var value = req.body.value
+
+  dbMet.getOne(username, m_name, (err: Error | null, result?: any) => {
+
+    result.forEach(element => {
+      var timestamp = element.timestamp
+      var key = username + '|' + m_name + '|' + timestamp
+
+      dbMet.updateOne(key, value, (err: Error | null) => {
+        if (err) {
+          console.log('Error updateOne')
+          res.status(500)
+        }
+        else res.status(200)
+      })
+    });
+  })
+})
+
 
 app.listen(port, (err: Error) => {
   if (err) {

@@ -6,7 +6,7 @@
 </head>
 
 <body class="container">
-  
+
   <div class="col-md-6 col-md-offset-3">
     <h1>Hello <%- name %></h1>
 
@@ -39,32 +39,71 @@
     <button class="btn btn-primary " id="allMetrics">
       Get All Metrics
     </button>
-    <div id="metrics"></div>
+    <!-- <div id="metrics"></div> -->
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col"> Metric </th>
+          <th scope="col"> Timestamp </th>
+          <th scope="col"> Value </th>
+        </tr>
+      </thead>
+      <tbody id="metrics">
+        <!-- Metrics insterted here -->
+      </tbody>
+    </table>
 
     <br /><br />
 
 
     <label for="form_m_name"> metric's name </label>
     <input type="text" id="m_name" />
-
+    <br />
     <button class="btn btn-primary " id="getOne_metric">
       Search metrics
     </button>
 
-    <br />
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"> Metric </th>
+            <th scope="col"> Timestamp </th>
+            <th scope="col"> Value </th>
+          </tr>
+        </thead>
+        <tbody id="searchMetrics">
+          <!-- Metrics insterted here -->
+        </tbody>
+      </table>
 
 
-    <div id="searchMetrics"></div>
+    <br /><br />
+
+    <label for="form_m_name"> metric's name </label>
+    <input type="text" id="m_name3" />
+
+    <label for="form_m_name"> Value </label>
+    <input type="number" id="value3" />
+
+    <button class="btn btn-primary" id="updateOne_metric">
+      Update Metric
+    </button>
+
+
+    <br /><br />
+
+
   </div>
 
   <!--delete metric-->
   <div class="form-group">
-      <label for="form_m_name"> m_name </label>
-      <input id="m_name2" type="text" name="m_name" />
-    </div>
-    <button class="btn btn-danger " id="deleteSearch" value="delete">
-      Delete Metric
-    </button>
+    <label for="form_m_name"> m_name </label>
+    <input id="m_name2" type="text" name="m_name" />
+  </div>
+  <button class="btn btn-danger " id="deleteSearch" value="delete">
+    Delete Metric
+  </button>
 
   <% if(name) { %>
   <script>
@@ -97,8 +136,15 @@
         success: (response) => {
           $.getJSON("/metrics", {}, (data) => {
             const content = data.map(d => {
-              return '<li>' + 'm_name: ' + d.m_name + ',timestamp: ' + d.timestamp + ', value: ' + d.value + '</li>';
+              return(
+                '<tr>' +
+                  '<td>' + d.m_name + '</td>'
+                  + '<td>' + d.timestamp + '</td>'
+                  + '<td>' + d.value + '</td>'
+                + '</tr>'
+              )
             })
+            $('#metrics').empty()
             $('#metrics').append(content.join("\n"));
           });
         }
@@ -109,8 +155,7 @@
       e.preventDefault();
       var m_name = document.getElementById("m_name").value
       if (m_name == '') {
-        //alert(`Please specify a metric's name`)
-        $('.alert').alert('close')
+        alert(`Please specify a metric name`)
       } else {
         $.ajax({
           async: true,
@@ -120,8 +165,14 @@
           success: (response) => {
             $.getJSON("/metrics/" + m_name, {}, (data) => {
               const content = data.map(d => {
-                return '<li>' + 'm_name: ' + d.m_name + ',timestamp: ' + d.timestamp + ', value: ' + d.value + '</li>';
-              })
+                return(
+                '<tr>' +
+                  '<td>' + d.m_name + '</td>'
+                  + '<td>' + d.timestamp + '</td>'
+                  + '<td>' + d.value + '</td>'
+                + '</tr>'
+              )              })
+              $('#searchMetrics').empty()
               $('#searchMetrics').append(content.join("\n"));
             });
             console.log('/metrics/' + m_name)
@@ -151,28 +202,31 @@
       })
     })
 
+    $('#updateOne_metric').click((e) => {  // update Metric
+      e.preventDefault();
+      var m_name = document.getElementById("m_name3").value
+      var value = document.getElementById("value3").value
+      if (m_name == '' || value == '') {
+        alert(`Please specify a metric name and a value`)
+      }
+      else {
+        $.ajax({
+          async: true,
+          url: '/metrics/' + m_name,
+          type: 'PUT',
+          data: JSON.stringify({ 'value': value }),
+          contentType: 'application/json',
+          success: () => {
+            window.location.replace('/')
+          },
+          error: () => {
+            console.log('Ouille ouille error')
+          }
+        })
+      }
 
-    /*
-          $.ajax({
-            async: true,
-            url: '/metrics/' + m_name,
-            type: 'GET',
-            contentType: 'application/json',
-            success: () => {/*
-              $.getJSON("/metrics", {}, (data) => {
-                const content = data.map(d => {
-                  return '<li>' + 'm_name: ' + d.m_name + ',timestamp: ' + d.timestamp + ', value: ' + d.value + '</li>';
-                })
-                $('#metrics').append(content.join("\n"));
-              });
-              console.log('/metrics/' + m_name)
-              console.log('yes dans le client')
-            },
-            error: () => {
-              console.log('Oh no ! A problem')
-            }
-    
-          })*/
+    })
+
 
   </script>
 </body>
