@@ -64,18 +64,18 @@ export class MetricsHandler {
       })
   }
 
-  /*
-  public getOne(key,
+  
+  public getOne(username : string , key: string ,
     callback: (error: Error | null, result: Metric[]) => void) {
-    let metrics: Metric[] = [];
-    this.db.createReadStream()
-      .on('data', function (data) {
-        if (data.key == key) {
-          let oneMetric: Metric = new Metric(data.key, data.value)
-          // trouver une methode pour afficher qu'un seul metric
-          metrics.push(oneMetric)
-          console.log(data.key, '=', data.value)
-        }
+      let metrics: Metric[] = [];
+      this.db.createReadStream()
+        .on('data', function (data) {
+          var [u, m_name, timestamp] = data.key.split('|')
+          var value = data.value
+          if( username==u && key == m_name){
+            let oneMetric: Metric = new Metric(u, m_name, timestamp, value)
+            metrics.push(oneMetric)
+          }
       })
       .on('error', function (err) {
         console.log('Oh my!', err)
@@ -90,12 +90,13 @@ export class MetricsHandler {
       })
   }
 
+
   public delOne(key, callback: (error: Error | null) => void) {
       
       this.db.del(key, callback(null ))
-      
   }
-
+  
+/*
   static get(callback: (error: Error | null, result?: Metric[]) => void) {
     const result = [
       new Metric('2013-11-04 14:00 UTC', 12),

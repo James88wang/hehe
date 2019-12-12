@@ -14,7 +14,7 @@ app.set('views', __dirname + "/../views")
 app.set('view engine', 'ejs');
 
 app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({extended:true}))
+app.use(bodyparser.urlencoded({ extended: true }))
 
 
 const LevelStore = levelSession(session)
@@ -27,7 +27,7 @@ app.use(session({
 }))
 
 authRouter.get('/login', (req: any, res: any) => {
-  res.render('login') 
+  res.render('login')
 })
 
 authRouter.get('/signup', (req: any, res: any) => {
@@ -40,7 +40,7 @@ authRouter.get('/logout', (req: any, res: any) => {
   delete req.session.user
   res.redirect('/login')
 })
- 
+
 authRouter.post('/login', (req: any, res: any, next: any) => {
   dbUser.get(req.body.username, (err: Error | null, result?: User) => {
     if (err) next(err)
@@ -68,7 +68,7 @@ const dbMet: MetricsHandler = new MetricsHandler('./db/metrics')
 userRouter.post('/', (req: any, res: any, next: any) => {
   dbUser.get(req.body.username, function (err: Error | null, result?: User) {
     if (!err || result !== undefined) {
-     res.status(409).send("user already exists")
+      res.status(409).send("user already exists")
     } else {
       let newUser = new User(req.body.username, req.body.email, req.body.password)
       dbUser.save(newUser, function (err: Error | null) {
@@ -100,14 +100,16 @@ const authCheck = function (req: any, res: any, next: any) {
     next()
   } else res.redirect('/login')
 }
- 
+
 app.get('/', authCheck, (req: any, res: any) => {
   res.render('index', { name: JSON.stringify(req.session.user.username) })
 })
 
- 
-app.post('/metrics', (req: any, res: any) => {
-  var dateNow = JSON.stringify( new Date )
+const metricRouter = express.Router()
+app.use('/metrics', metricRouter)
+
+metricRouter.post('/', (req: any, res: any) => {
+  var dateNow = JSON.stringify(new Date)
   var myMetric = new Metric(req.session.user.username, req.body.m_name, dateNow, req.body.value)
   dbMet.save(myMetric, (err: Error | null) => {
     if (err) throw err
@@ -116,8 +118,19 @@ app.post('/metrics', (req: any, res: any) => {
 })
 
 
-app.get('/metrics', (req: any, res: any) => {
-  dbMet.getAll( req.session.user.username,
+metricRouter.get('/', (req: any, res: any) => {
+    dbMet.getAll(req.session.user.username,
+      (
+        err: Error | null, result?: any
+      ) => {
+        if (err) throw err
+        res.status(200).send(result)
+      })
+}) 
+
+metricRouter.get('/:m_name', (req: any, res: any) => {
+  
+  dbMet.getOne( req.session.user.username, req.params.m_name,
     (
       err: Error | null, result?: any
     ) => {
@@ -126,6 +139,24 @@ app.get('/metrics', (req: any, res: any) => {
     })
 })
 
+metricRouter.delete('/:m_name', (req: any, res: any) => { 
+  var username = req.session.user.username
+  var m_name = req.params.m_name
+  var metrics
+
+  dbMet.getOne(username, m_name, (err: Error | null, result?: any)=> {
+    metrics = result
+
+    metrics.forEach(element => {
+      var timestamp = element.timestamp
+      var key = username + '|' + m_name + '|' + timestamp
+  
+      dbMet.delOne(key, (err: Error | null) => {  console.log('Error delOne')})
+    });
+  })
+
+  res.redirect('/')
+})
 
 
 /*

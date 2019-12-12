@@ -6,11 +6,9 @@
 </head>
 
 <body class="container">
+  
   <div class="col-md-6 col-md-offset-3">
     <h1>Hello <%- name %></h1>
-    <button class="btn btn-success" id="show-metrics">
-      Bring the metrics
-    </button>
 
     <button class="btn btn-danger" href="/logout" onClick='document.location.href="/logout"'>
       Logout
@@ -18,61 +16,76 @@
 
     <button class="btn btn-danger " id="delete" type="submit" value="delete">
       Delete
-    </button>
+    </button> <br /><br />
 
 
     <form action="/metrics" method="post">
 
       <div class="form-group">
         <label for="form_m_name"> m_name </label>
-        <input id="form_m_name" type="text" name="m_name" />
+        <input required id="form_m_name" type="text" name="m_name" />
       </div>
       <div class="form-group">
         <label for="form_number"> Value </label>
-        <input id="form_number" type="number" name="value" />
+        <input required id="form_number" type="number" name="value" />
       </div>
       <button class="btn btn-success " type="submit" value="post">
         Post metric
       </button>
     </form>
 
-      <button class="btn btn-primary " id="allMetrics">
-        Get All Metrics
-      </button>
+    <br />
 
+    <button class="btn btn-primary " id="allMetrics">
+      Get All Metrics
+    </button>
     <div id="metrics"></div>
+
+    <br /><br />
+
+
+    <label for="form_m_name"> metric's name </label>
+    <input type="text" id="m_name" />
+
+    <button class="btn btn-primary " id="getOne_metric">
+      Search metrics
+    </button>
+
+    <br />
+
+
+    <div id="searchMetrics"></div>
   </div>
+
+  <!--delete metric-->
+  <div class="form-group">
+      <label for="form_m_name"> m_name </label>
+      <input id="m_name2" type="text" name="m_name" />
+    </div>
+    <button class="btn btn-danger " id="deleteSearch" value="delete">
+      Delete Metric
+    </button>
 
   <% if(name) { %>
   <script>
-    const username = <% - name %>
+    const username = <%- name %>
   </script>
   <% } %>
 
 
   <script>
-      $('#show-metrics').click((e) => {
+      $('#delete').click((e) => {
         e.preventDefault();
-        $.getJSON("/metrics.json", {}, (data) => {
-          const content = data.map(d => {
-            return 'timestamp: ' + d.timestamp + ', value: ' + d.value + '';
-          })
-          $('#metrics').append(content.join("\n"));
-        });
+        $.ajax({
+          async: true,
+          url: '/user/' + username,
+          type: 'DELETE',
+          contentType: 'application/json',
+          success: () => {
+            window.location.replace('/login')
+          }
+        })
       })
-
-    $('#delete').click((e) => {
-      e.preventDefault();
-      $.ajax({
-        async: true,
-        url: '/user/' + username,
-        type: 'DELETE',
-        contentType: 'application/json',
-        success: () => {
-          window.location.replace('/login')
-        }
-      })
-    })
 
     $('#allMetrics').click((e) => {
       e.preventDefault();
@@ -84,13 +97,82 @@
         success: (response) => {
           $.getJSON("/metrics", {}, (data) => {
             const content = data.map(d => {
-              return   'm_name: ' + d.m_name + ',timestamp: ' + d.timestamp + ', value: ' + d.value + '\n' ;
+              return '<li>' + 'm_name: ' + d.m_name + ',timestamp: ' + d.timestamp + ', value: ' + d.value + '</li>';
             })
             $('#metrics').append(content.join("\n"));
           });
         }
       })
     })
+
+    $('#getOne_metric').click((e) => {
+      e.preventDefault();
+      var m_name = document.getElementById("m_name").value
+      if (m_name == '') {
+        //alert(`Please specify a metric's name`)
+        $('.alert').alert('close')
+      } else {
+        $.ajax({
+          async: true,
+          url: '/metrics/' + m_name,
+          type: 'GET',
+          contentType: 'application/json',
+          success: (response) => {
+            $.getJSON("/metrics/" + m_name, {}, (data) => {
+              const content = data.map(d => {
+                return '<li>' + 'm_name: ' + d.m_name + ',timestamp: ' + d.timestamp + ', value: ' + d.value + '</li>';
+              })
+              $('#searchMetrics').append(content.join("\n"));
+            });
+            console.log('/metrics/' + m_name)
+            console.log('yes dans le client')
+          },
+          error: () => {
+            console.log('Oh no ! A problem')
+          }
+        })
+      }
+
+    }
+    )
+
+
+    $('#deleteSearch').click((e) => {  // delete Metric
+      e.preventDefault();
+      var m_name = document.getElementById("m_name2").value
+      $.ajax({
+        async: true,
+        url: '/metrics/' + m_name,
+        type: 'DELETE',
+        contentType: 'application/json',
+        success: () => {
+          window.location.replace('/')
+        }
+      })
+    })
+
+
+    /*
+          $.ajax({
+            async: true,
+            url: '/metrics/' + m_name,
+            type: 'GET',
+            contentType: 'application/json',
+            success: () => {/*
+              $.getJSON("/metrics", {}, (data) => {
+                const content = data.map(d => {
+                  return '<li>' + 'm_name: ' + d.m_name + ',timestamp: ' + d.timestamp + ', value: ' + d.value + '</li>';
+                })
+                $('#metrics').append(content.join("\n"));
+              });
+              console.log('/metrics/' + m_name)
+              console.log('yes dans le client')
+            },
+            error: () => {
+              console.log('Oh no ! A problem')
+            }
+    
+          })*/
 
   </script>
 </body>
