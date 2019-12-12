@@ -104,4 +104,8 @@ export class MetricsHandler {
     })
   }
 
+  public close(){
+    this.db.close()
+  }
+
 }
