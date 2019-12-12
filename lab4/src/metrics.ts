@@ -92,7 +92,7 @@ export class MetricsHandler {
 
   public delOne(key: string , callback: (error: Error | null) => void) {
       
-      this.db.del(key, callback(null ))
+      this.db.del(key, callback(null))
   }
 
   public updateOne(key: string, value: number , callback: (error: Error | null) => void) {
