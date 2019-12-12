@@ -3,3 +3,4 @@ node_js:
   - "v12.13.0"
   - node
 
+script: npm test
