@@ -81,8 +81,8 @@ To install Lab 4, follow these steps:
 
 @all-contributors please add HenintsoaRaza for code
 
-* [@James88wang](https://github.com/James88wang) 📖
-* [@HenintsoaRaza](https://github.com/HenintsoaRaza) 🐛
+* [@James88wang](https://github.com/James88wang) 💻
+* [@HenintsoaRaza](https://github.com/HenintsoaRaza) 💻
 
 
 ## Contact
