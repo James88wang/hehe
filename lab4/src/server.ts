@@ -5,6 +5,7 @@ import bodyparser = require('body-parser')
 import session = require('express-session')
 import levelSession = require('level-session-store')
 import { UserHandler, User } from './user'
+const flash = require('connect-flash');
 
 const port: string = process.env.PORT || '8082'
 
@@ -15,6 +16,7 @@ const app = express()
 app.set('views', __dirname + "/../views")
 app.set('view engine', 'ejs');
 
+app.use(flash())
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, '/../public')))
@@ -42,7 +44,7 @@ authRouter.get('/login', (req: any, res: any) => {
 })
 
 authRouter.get('/signup', (req: any, res: any) => {
-  res.render('signup')
+  res.render('signup',{ message: req.flash('message')})
 })
 
 authRouter.get('/logout', (req: any, res: any) => {
@@ -86,12 +88,13 @@ app.use('/user', userRouter)
 userRouter.post('/', (req: any, res: any, next: any) => {
   dbUser.get(req.body.username, function (err: Error | null, result?: User) {
     if (!err || result !== undefined) {
-      res.status(409).send("user already exists")
+      req.flash('message', 'Sorry, user already exist')
+      res.status(409).redirect('/signup')
     } else {
       let newUser = new User(req.body.username, req.body.email, req.body.password)
       dbUser.save(newUser, function (err: Error | null) {
         if (err) next(err)
-        else res.status(201).send("user persisted")
+        else res.status(201).redirect('/login')
       })
     }
   })
@@ -106,6 +109,19 @@ userRouter.get('/:username', (req: any, res: any, next: any) => {
 })
 
 userRouter.delete('/:username', (req: any, res: any) => {
+  dbMet.getAll(req.session.user.username, (error: Error|null, result: Metric[])=>{
+
+    result.forEach(element => {
+      var key = element.username + '|' + element.m_name + '|' + element.timestamp
+
+      dbMet.delOne(key, (err: Error | null) => {
+        if (err) {
+          console.log('Error delOne')
+        }
+      })
+    })
+  })
+
   dbUser.delete(req.params.username, function (err: Error | null, result?: User) {
     res.end()
   })

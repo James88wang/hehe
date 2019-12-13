@@ -6,7 +6,12 @@
 </head>
 
 <body class="container">
-
+    <%if(message != ""){%>
+        <div class="alert">
+                <%= message%>
+        </div>
+    <% } %>
+    
     <div id="form">
         <p>Please signup </p>
         <hr />
