@@ -1,48 +1,91 @@
 ![GitHub Logo](/images/logoece.jpg)
-## ECE-NodeJS-Project Lab 3 
-Lab 3 allows to:
-  * add metrics
-  * get one metric by key
-  * get all metrics
-  * delete one metric by key
+# ECE-NodeJS-Project Lab 4
+[![Build Status](https://travis-ci.com/HenintsoaRaza/lab4.svg?branch=master)](https://travis-ci.com/HenintsoaRaza/lab4)
+
+Lab 4 allows:
+
+  * CRUD users
+  * User authentication
+  * for a user to get ONLY his metrics
+  * Unit tests for save/update/delete/get metric functions
 
 
-#Prerequisites
----
+
+## Prerequisites
+
 Before you begin, ensure you have met the following requirement:
-  * You have to install Node.js
-
-Installing lab3
----
-To install lab 3:
-  * git clone https://github.com/James88wang/ECE-NodeJS-Project.git
-  * go to "ECE-NodeJS-Project/lab3" directory 
-  * npm install 
-  
-  
-#Using lab3
----
-go to lab3 terminal
-npm run start
-
-Post some metrics with Postman
-* Set up a POST request on /metrics
-* Set the header Content-Type:application/json
-* Add an array of metrics as RAW body :
-	* [{ "timestamp":"1384686660000", "value":"10" }]
-
-localhost:8082/metrics/getAll <!---in order to retrieve all metrics --->
-localhost:8082/metrics/getOne <!---in order to retrieve one metric by key --->
-localhost:8082/metrics/delOne <!---in order to delete one metric by key --->
+  * You have installed the latest version of `node JS`
 
 
-#Contributors
----
-Wang James - Henintsoa Razafindrazaka
+
+## Installing Lab 4
+
+To install Lab 4, follow these steps:
+1. Open your terminal
+2. Go to the directory of your choice to clone the project
+3. Clone the repository with git Bash:
+
+```shell
+> git clone https://github.com/James88wang/ECE-NodeJS-Project.git
+```
+
+4. Then move to the `/lab4` directory:
+
+```bash
+> cd lab4
+```
+
+5. Install the dependencies:
+
+```shell
+> npm install
+```
 
 
-#Contact
----
+
+
+## Using Lab 4
+
+##### To launch the Lab 4 project
+
+1. Go to the `<my_path>/ECE-NodeJS-Project/lab4` directory:
+
+```shell
+> cd <my_path>/ECE-NodeJS-Project/lab4
+```
+
+2. Run the project:
+
+```shell
+> npm start
+```
+
+
+
+##### To start using the project
+
+1. Create a user by signing up
+2. Sign in with your credentials
+3. Add metrics, specifying the name and the value in the `m_name` and `Value` input fields, and clicking on the `Post metric` button
+4. Display all the metrics by clicking on the `Get All Metrics` button
+5. Display a specific metric by specifying the name of it the `metric's name` input field and clicking on the `Search metrics` button
+6. Delete a metric by specifying the name of it and clicking on the `Delete Metric` button
+7. Logout from your account by clicking on the `Logout` button or delete the account by clicking on the `Delete` button
+
+
+
+
+## Contributors
+
+@all-contributors please add James88wang for code
+
+@all-contributors please add HenintsoaRaza for code
+
+
+
+
+## Contact
+
 
 * james.wang@edu.ece.fr
 * henintsoa.razafindrazaka@edu.ece.fr
