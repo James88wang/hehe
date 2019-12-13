@@ -76,10 +76,6 @@ To install Lab 4, follow these steps:
 
 ## Contributors
 
-@all-contributors please add James88wang for code
-
-@all-contributors please add HenintsoaRaza for code
-
 * [@James88wang](https://github.com/James88wang) 💻
 * [@HenintsoaRaza](https://github.com/HenintsoaRaza) 💻
 
