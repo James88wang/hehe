@@ -1,4 +1,3 @@
-![GitHub Logo](/images/logoece.jpg)
 # ECE-NodeJS-Project Lab 4
 [![Build Status](https://travis-ci.com/HenintsoaRaza/lab4.svg?branch=master)](https://travis-ci.com/HenintsoaRaza/lab4)
 
