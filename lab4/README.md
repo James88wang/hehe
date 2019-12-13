@@ -45,7 +45,7 @@ To install Lab 4, follow these steps:
 
 ## Using Lab 4
 
-##### To launch the Lab 4 project
+### To launch the Lab 4 project
 
 1. Go to the `<my_path>/ECE-NodeJS-Project/lab4` directory:
 
@@ -61,7 +61,7 @@ To install Lab 4, follow these steps:
 
 
 
-##### To start using the project
+### To start using the project
 
 1. Create a user by signing up
 2. Sign in with your credentials
