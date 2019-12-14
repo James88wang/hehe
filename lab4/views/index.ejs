@@ -141,10 +141,22 @@
 
 		var result = []
 
+		var sortResult = (result) => {
+			for (let x = 0; x < result.length - 1; x++) {
+				if (result[x].timestamp > result[x + 1].timestamp) {
+					var temp = result[x]
+					result[x] = result[x + 1]
+					result[x + 1] = temp
+				}
+			}
+			return result
+		}
+
 		var printGraph = () => {
 			if (Array.isArray(result) && result.length) {
 				var data = []
 				var labels = []
+
 				result.forEach(element => {
 					labels.push(new Date(element.timestamp).toLocaleString())
 					data.push({ t: new Date(element.timestamp), y: element.value })
@@ -186,10 +198,10 @@
 						tooltips: {
 							callbacks: {
 								label: function (tooltipItem, data) {
-									var x = tooltipItem.index 
+									var x = tooltipItem.index
 									var metName = result[x].m_name
 									var val = result[x].value
-									return 'Metric: ' + metName + ', Value: ' + val 
+									return 'Metric: ' + metName + ', Value: ' + val
 								}
 							}
 						}
@@ -222,10 +234,16 @@
 				contentType: 'application/json',
 				success: (response) => {
 					result = response
+
+					result = sortResult(result)
+
 					printGraph()
 
 					$.getJSON("/metrics", {}, (data) => {
-						const content = data.map(d => {
+						console.log(data)
+						var result = sortResult(data) 
+						console.log(result)						
+						const content = result.map(d => {
 							return (
 								'<tr>' +
 								'<td>' + d.m_name + '</td>'
