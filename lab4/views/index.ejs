@@ -2,234 +2,324 @@
 <html lang="en">
 
 <head>
-  <% include partials/head %>
+	<% include partials/head %>
 </head>
 
-<body class="container">
+<body class="container bg-dark text-white ">
 
-  <div class="col-md-6 col-md-offset-3">
-    <h1>Hello <%- name %></h1>
+	<div class="col-md-12 col-md-offset-3">
+		<h1>Hello <%- name %></h1>
 
-    <button class="btn btn-danger" href="/logout" onClick='document.location.href="/logout"'>
-      Logout
-    </button>
+		<button class="btn btn-danger" href="/logout" onClick='document.location.href="/logout"'>
+			Logout
+		</button>
 
-    <button class="btn btn-danger " id="delete" type="submit" value="delete">
-      Delete
-    </button> <br /><br />
-
-
-    <form action="/metrics" method="post">
-
-      <div class="form-group">
-        <label for="form_m_name"> m_name </label>
-        <input required id="form_m_name" type="text" name="m_name" />
-      </div>
-      <div class="form-group">
-        <label for="form_number"> Value </label>
-        <input required id="form_number" type="number" name="value" />
-      </div>
-      <button class="btn btn-success " type="submit" value="post">
-        Post metric
-      </button>
-    </form>
-
-    <br />
-
-    <button class="btn btn-primary " id="allMetrics">
-      Get All Metrics
-    </button>
-    <!-- <div id="metrics"></div> -->
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col"> Metric </th>
-          <th scope="col"> Timestamp </th>
-          <th scope="col"> Value </th>
-        </tr>
-      </thead>
-      <tbody id="metrics">
-        <!-- Metrics insterted here -->
-      </tbody>
-    </table>
-
-    <br /><br />
+		<button class="btn btn-danger " id="delete" type="submit" value="delete">
+			Delete
+		</button> <br /><br />
 
 
-    <label for="form_m_name"> metric's name </label>
-    <input type="text" id="m_name" />
-    <br />
-    <button class="btn btn-primary " id="getOne_metric">
-      Search metrics
-    </button>
+		<form action="/metrics" method="post"
+			class="bg-dark rounded border border-secondary d-flex justify-content-center align-items-center">
 
-    <table class="table">
-        <thead>
-          <tr>
-            <th scope="col"> Metric </th>
-            <th scope="col"> Timestamp </th>
-            <th scope="col"> Value </th>
-          </tr>
-        </thead>
-        <tbody id="searchMetrics">
-          <!-- Metrics insterted here -->
-        </tbody>
-      </table>
+			<div class="form-group">
+				<br>
+				<label for="form_m_name"> m_name </label>
+				<input required id="form_m_name" type="text" name="m_name" class="bg-dark text-white rounded" />
+			</div>
+			<div class="form-group">
+				<br>
+				<label for="form_number"> Value </label>
+				<input required id="form_number" type="number" name="value" class="bg-dark text-white rounded" />
+			</div><br>
+			<button class="btn btn-success " type="submit" value="post">
+				Post metric
+			</button>
+		</form>
 
+		<br />
+	</div>
 
-    <br /><br />
-
-    <label for="form_m_name"> metric's name </label>
-    <input type="text" id="m_name3" />
-
-    <label for="form_m_name"> Value </label>
-    <input type="number" id="value3" />
-
-    <button class="btn btn-primary" id="updateOne_metric">
-      Update Metric
-    </button>
+	<div class="bg-dark rounded border border-secondary justify-content-center align-items-center text-center">
+		<br>
+		<div class="text-center">
+			<button class="btn btn-primary " id="allMetrics">
+				Get All Metrics
+			</button>
+		</div>
 
 
-    <br /><br />
+		<br />
+
+		<table class="table table-striped table-dark text-white ">
+			<thead>
+				<tr>
+					<th scope="col"> Metric </th>
+					<th scope="col"> Timestamp </th>
+					<th scope="col"> Value </th>
+				</tr>
+			</thead>
+			<tbody id="metrics">
+				<!-- Metrics insterted here -->
+			</tbody>
+		</table>
+
+		<div class="container">
+			<canvas class="text-white" id="myGraph"></canvas>
+		</div>
+	</div>
+
+	<br /><br />
+
+	<div class="bg-dark rounded border border-secondary justify-content-center align-items-center text-center">
+		<br>
+		<label for="form_m_name"> Metric's name </label>
+		<input type="text" id="m_name" class="bg-dark text-white rounded" />
+
+		<button class="btn btn-primary " id="getOne_metric">
+			Search metrics
+		</button>
+		<br><br>
+
+		<table class="table table-striped table-dark text-white ">
+			<thead>
+				<tr>
+					<th scope="col"> Metric </th>
+					<th scope="col"> Timestamp </th>
+					<th scope="col"> Value </th>
+				</tr>
+			</thead>
+			<tbody id="searchMetrics">
+				<!-- Metrics insterted here -->
+			</tbody>
+		</table>
+	</div>
+
+	<br /><br />
+
+	<div class="bg-dark rounded border border-secondary justify-content-center align-items-center text-center">
+		<br>
+		<label for="form_m_name"> Metric's name </label>
+		<input type="text" id="m_name3" class="bg-dark text-white rounded" />
+
+		<label for="form_m_name"> Value </label>
+		<input type="number" id="value3" class="bg-dark text-white rounded" />
+
+		<button class="btn btn-warning" id="updateOne_metric">
+			Update Metric
+		</button>
+		<br> <br>
+	</div>
+
+	<br /><br />
 
 
-  </div>
 
-  <!--delete metric-->
-  <div class="form-group">
-    <label for="form_m_name"> m_name </label>
-    <input id="m_name2" type="text" name="m_name" />
-  </div>
-  <button class="btn btn-danger " id="deleteSearch" value="delete">
-    Delete Metric
-  </button>
+	<!--delete metric-->
+	<div class="bg-dark rounded border border-secondary justify-content-center align-items-center text-center">
+		<br>
+		<label for="form_m_name"> m_name </label>
+		<input id="m_name2" type="text" name="m_name" class="bg-dark text-white rounded" />
 
-  <% if(name) { %>
-  <script>
-    const username = <%- name %>
-  </script>
-  <% } %>
+		<button class="btn btn-danger " id="deleteSearch" value="delete">
+			Delete Metric
+		</button>
+		<br><br>
+	</div>
+
+	<br><br><br><br>
 
 
-  <script>
-      $('#delete').click((e) => {
-        e.preventDefault();
-        $.ajax({
-          async: true,
-          url: '/user/' + username,
-          type: 'DELETE',
-          contentType: 'application/json',
-          success: () => {
-            window.location.replace('/login')
-          }
-        })
-      })
-
-    $('#allMetrics').click((e) => {
-      e.preventDefault();
-      $.ajax({
-        async: true,
-        url: '/metrics',
-        type: 'GET',
-        contentType: 'application/json',
-        success: (response) => {
-          $.getJSON("/metrics", {}, (data) => {
-            const content = data.map(d => {
-              return(
-                '<tr>' +
-                  '<td>' + d.m_name + '</td>'
-                  + '<td>' + d.timestamp + '</td>'
-                  + '<td>' + d.value + '</td>'
-                + '</tr>'
-              )
-            })
-            $('#metrics').empty()
-            $('#metrics').append(content.join("\n"));
-          });
-        }
-      })
-    })
-
-    $('#getOne_metric').click((e) => {
-      e.preventDefault();
-      var m_name = document.getElementById("m_name").value
-      if (m_name == '') {
-        alert(`Please specify a metric name`)
-      } else {
-        $.ajax({
-          async: true,
-          url: '/metrics/' + m_name,
-          type: 'GET',
-          contentType: 'application/json',
-          success: (response) => {
-            $.getJSON("/metrics/" + m_name, {}, (data) => {
-              const content = data.map(d => {
-                return(
-                '<tr>' +
-                  '<td>' + d.m_name + '</td>'
-                  + '<td>' + d.timestamp + '</td>'
-                  + '<td>' + d.value + '</td>'
-                + '</tr>'
-              )              })
-              $('#searchMetrics').empty()
-              $('#searchMetrics').append(content.join("\n"));
-            });
-            console.log('/metrics/' + m_name)
-            console.log('yes dans le client')
-          },
-          error: () => {
-            console.log('Oh no ! A problem')
-          }
-        })
-      }
-
-    }
-    )
-
-// il faudrait ajouter un message comme quoi on a bien delete
-
-    $('#deleteSearch').click((e) => {  // delete Metric
-      e.preventDefault();
-      var m_name = document.getElementById("m_name2").value
-      $.ajax({
-        async: true,
-        url: '/metrics/' + m_name,
-        type: 'DELETE',
-        contentType: 'application/json',
-        success: () => {
-          window.location.replace('/')
-        }
-      })
-    })
-// il faudrait ajouter un message comme quoi on a bien update
-    $('#updateOne_metric').click((e) => {  // update Metric
-      e.preventDefault();
-      var m_name = document.getElementById("m_name3").value
-      var value = document.getElementById("value3").value
-      if (m_name == '' || value == '') {
-        alert(`Please specify a metric name and a value`)
-      }
-      else {
-        $.ajax({
-          async: true,
-          url: '/metrics/' + m_name,
-          type: 'PUT',
-          data: JSON.stringify({ 'value': value }),
-          contentType: 'application/json',
-          success: () => {
-            window.location.replace('/')
-          },
-          error: () => {
-            console.log('Ouille ouille error')
-          }
-        })
-      }
-
-    })
+	<% if(name) { %>
+	<script>
+		const username = `<%- name %>`
+	</script>
+	<% } %>
 
 
-  </script>
+	<script>
+
+		var result = []
+
+		var printGraph = () => {
+			if (Array.isArray(result) && result.length) {
+				var data = []
+				var labels = []
+				result.forEach(element => {
+					labels.push(new Date(element.timestamp).toLocaleString())
+					data.push({ t: new Date(element.timestamp), y: element.value })
+				})
+
+				var ctx = document.getElementById("myGraph").getContext("2d");
+
+				Chart.defaults.global.defaultFontColor = 'white';
+
+				var myChart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						labels: labels,
+						datasets: [{
+							label: 'My Metrics',
+							data: data,
+							backgroundColor: 'rgba(0, 0, 0, 0)',
+							/*[
+								'rgba(255, 99, 132, 0.2)',
+								'rgba(54, 162, 235, 0.2)',
+								'rgba(255, 206, 86, 0.2)',
+								'rgba(75, 192, 192, 0.2)',
+								'rgba(153, 102, 255, 0.2)',
+								'rgba(255, 159, 64, 0.2)'
+							]*/
+							borderColor: 'rgba(255,99,132,1)',
+							/*[
+								'rgba(255,99,132,1)',
+								'rgba(54, 162, 235, 1)',
+								'rgba(255, 206, 86, 1)',
+								'rgba(75, 192, 192, 1)',
+								'rgba(153, 102, 255, 1)',
+								'rgba(255, 159, 64, 1)'
+							]*/
+							borderWidth: 1
+						}]
+					},
+					options: {
+						tooltips: {
+							callbacks: {
+								label: function (tooltipItem, data) {
+									var x = tooltipItem.index 
+									var metName = result[x].m_name
+									var val = result[x].value
+									return 'Metric: ' + metName + ', Value: ' + val 
+								}
+							}
+						}
+					}
+
+
+				});
+			}
+		}
+
+		$('#delete').click((e) => {
+			e.preventDefault();
+			$.ajax({
+				async: true,
+				url: '/user/' + username,
+				type: 'DELETE',
+				contentType: 'application/json',
+				success: () => {
+					window.location.replace('/login')
+				}
+			})
+		})
+
+		$('#allMetrics').click((e) => {
+			e.preventDefault();
+			$.ajax({
+				async: true,
+				url: '/metrics',
+				type: 'GET',
+				contentType: 'application/json',
+				success: (response) => {
+					result = response
+					printGraph()
+
+					$.getJSON("/metrics", {}, (data) => {
+						const content = data.map(d => {
+							return (
+								'<tr>' +
+								'<td>' + d.m_name + '</td>'
+								+ '<td>' + (new Date(d.timestamp)).toLocaleString() + '</td>'
+								+ '<td>' + d.value + '</td>'
+								+ '</tr>'
+							)
+						})
+						$('#metrics').empty()
+						$('#metrics').append(content.join("\n"));
+					});
+				}
+			})
+		})
+
+		$('#getOne_metric').click((e) => {
+			e.preventDefault();
+			var m_name = document.getElementById("m_name").value
+			if (m_name == '') {
+				alert(`Please specify a metric name`)
+			} else {
+				$.ajax({
+					async: true,
+					url: '/metrics/' + m_name,
+					type: 'GET',
+					contentType: 'application/json',
+					success: (response) => {
+						$.getJSON("/metrics/" + m_name, {}, (data) => {
+							const content = data.map(d => {
+								return (
+									'<tr>' +
+									'<td>' + d.m_name + '</td>'
+									+ '<td>' + (new Date(d.timestamp)).toLocaleString() + '</td>'
+									+ '<td>' + d.value + '</td>'
+									+ '</tr>'
+								)
+							})
+							$('#searchMetrics').empty()
+							$('#searchMetrics').append(content.join("\n"));
+						});
+						console.log('/metrics/' + m_name)
+						console.log('yes dans le client')
+					},
+					error: () => {
+						console.log('Oh no ! A problem')
+					}
+				})
+			}
+		}
+		)
+
+		$('#deleteSearch').click((e) => {  // delete Metric
+			e.preventDefault();
+			var m_name = document.getElementById("m_name2").value
+			$.ajax({
+				async: true,
+				url: '/metrics/' + m_name,
+				type: 'DELETE',
+				contentType: 'application/json',
+				success: () => {
+					alert('Delete successful :) ')
+					window.location.replace('/')
+				}
+			})
+		})
+
+		$('#updateOne_metric').click((e) => {  // update Metric
+			e.preventDefault();
+			var m_name = document.getElementById("m_name3").value
+			var value = document.getElementById("value3").value
+			if (m_name == '' || value == '') {
+				alert(`Please specify a metric name and a value`)
+			}
+			else {
+				$.ajax({
+					async: true,
+					url: '/metrics/' + m_name,
+					type: 'PUT',
+					data: JSON.stringify({ 'value': value }),
+					contentType: 'application/json',
+					success: () => {
+						alert('Update successful :) ')
+						window.location.replace('/')
+					},
+					error: () => {
+						console.log('Ouille ouille error')
+					}
+				})
+			}
+
+		})
+
+
+	</script>
 </body>
 
 </html>

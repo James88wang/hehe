@@ -73,7 +73,7 @@ const authCheck = function (req: any, res: any, next: any) {
 }
 
 app.get('/', authCheck, (req: any, res: any) => {
-  res.render('index', { name: JSON.stringify(req.session.user.username) })
+  res.render('index', { name: req.session.user.username })
 })
 
 
@@ -138,7 +138,7 @@ const metricRouter = express.Router()
 app.use('/metrics', metricRouter)
 
 metricRouter.post('/', (req: any, res: any) => {
-  var dateNow = JSON.stringify(new Date)
+  var dateNow = (new Date).toISOString()
   var myMetric = new Metric(req.session.user.username, req.body.m_name, dateNow, req.body.value)
   dbMet.save(myMetric, (err: Error | null) => {
     if (err) throw err
@@ -183,7 +183,7 @@ metricRouter.delete('/:m_name', (req: any, res: any) => {
           console.log('Error delOne')
           res.status(500)
         }
-        else res.status(200)
+        else res.status(200).send('ok')
       })
     });
   })
@@ -203,9 +203,9 @@ metricRouter.put('/:m_name', (req: any, res: any) => {
       dbMet.updateOne(key, value, (err: Error | null) => {
         if (err) {
           console.log('Error updateOne')
-          res.status(500)
+          res.status(500).send('nok')
         }
-        else res.status(200)
+        else res.status(200).send('ok')
       })
     });
   })
